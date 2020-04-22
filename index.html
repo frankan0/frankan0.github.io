@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    
+    frank0&#39;s Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="frank0's Blog" type="application/atom+xml">
+</head>
+
+<body>
+<main class="content">
+  <section class="jumbotron">
+  <div class="video">
+    
+      <div class="video-frame">
+        <img src="/images/ocean/overlay-hero.png" alt="Decorative image frame">
+      </div>
+    
+    <div class="video-media">
+      <video playsinline="" autoplay="" loop="" muted="" data-autoplay=""
+             poster="/images/ocean/ocean.png" x5-video-player-type="h5">
+        <source src="/images/ocean/ocean.mp4" type="video/mp4">
+        <source src="/images/ocean/ocean.ogv" type="video/ogg">
+        <source src="/images/ocean/ocean.webm" type="video/webm">
+        <p>Your user agent does not support the HTML5 Video element.</p>
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+    <div class="video-inner text-center text-white">
+      <h1><a href="/">frank0&#39;s Blog</a></h1>
+      <p>maker&amp;coder&amp;father</p>
+      <div><img src="/images/hexo-inverted.svg" class="brand" alt="frank0&#39;s Blog"></div>
+    </div>
+    <div class="video-learn-more">
+      <a class="anchor" href="#landingpage"><i class="fe fe-mouse"></i></a>
+    </div>
+  </div>
+</section>
+
+<div id="landingpage">
+  <section class="outer">
+    <article class="articles">
+      
+      <h1 class="page-type-title"></h1>
+      
+        
+          <article id="post-Thymeleaf-Layout-GC-Error" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2020/04/22/Thymeleaf-Layout-GC-Error/">Thymeleaf-Layout引起的内存泄露</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2020/04/22/Thymeleaf-Layout-GC-Error/" class="article-date">
+  <time datetime="2020-04-22T04:17:43.000Z" itemprop="datePublished">2020-04-22</time>
+</a>
+                            
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <a id="more"></a>
+
+<p>服务器硬件信息：</p>
+<p>SSD: 80 GB RAID-10<br>RAM: 4096 MB<br>CPU: 2x Intel Xeon</p>
+<p>软件信息：</p>
+<p>MySQL,Redis,JDK8,SpringBoot,Thymeleaf</p>
+<p>JVM参数：<code>/opt/jdk1.8.0_191/bin/java -jar -Xloggc:/opt/mb-gc.log -XX:+PrintGC -XX:+PrintGCDateStamps -Xms2500m -Xmx2500m -javaagent:/opt/tingyun/tingyun-agent-java.jar /demo.0.0.1-SNAPSHOT.jar --spring.profiles.active=online</code></p>
+<p>用来跑了一些Java程序，运行一天之后，出现OOM异常</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.springframework.web.util.NestedServletException: Handler dispatch failed; nested exception is java.lang.OutOfMemoryError: GC overhead limit exceeded</span><br></pre></td></tr></table></figure>
+
+<p>GC overhead limit exceeded异常，GOOGLE一番：</p>
+<p>The <em>java.lang.OutOfMemoryError: GC overhead limit exceeded</em> error is the JVM’s way of signalling that your application spends too much time doing garbage collection with too little result. By default the JVM is configured to throw this error if it spends more than <strong>98% of the total time doing GC and when after the GC only less than 2% of the heap is recovered</strong>.</p>
+<p>JVM抛出 <em>java.lang.OutOfMemoryError: GC overhead limit exceeded</em> 错误就是发出了这样的信号: 执行垃圾收集的时间比例太大, 有效的运算量太小. 默认情况下, 如果GC花费的时间超过 <strong>98%</strong>, 并且GC回收的内存少于 <strong>2%</strong>, JVM就会抛出这个错误。</p>
+<p>接着，我们看下JVM内存分配：</p>
+<p>使用<code>JPS</code>命令找出pid，使用<code>JMAP -heap ${pid}</code> 打印内存信息：</p>
+<p>问题现场 heap信息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">Attaching to process ID 1638, please wait...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is 25.191-b12</span><br><span class="line"></span><br><span class="line">using thread-local object allocation.</span><br><span class="line">Parallel GC with 4 thread(s)</span><br><span class="line"></span><br><span class="line">Heap Configuration:</span><br><span class="line">   MinHeapFreeRatio         = 0</span><br><span class="line">   MaxHeapFreeRatio         = 100</span><br><span class="line">   MaxHeapSize              = 2621440000 (2500.0MB)</span><br><span class="line">   NewSize                  = 873463808 (833.0MB)</span><br><span class="line">   MaxNewSize               = 873463808 (833.0MB)</span><br><span class="line">   OldSize                  = 1747976192 (1667.0MB)</span><br><span class="line">   NewRatio                 = 2</span><br><span class="line">   SurvivorRatio            = 8</span><br><span class="line">   MetaspaceSize            = 21807104 (20.796875MB)</span><br><span class="line">   CompressedClassSpaceSize = 1073741824 (1024.0MB)</span><br><span class="line">   MaxMetaspaceSize         = 17592186044415 MB</span><br><span class="line">   G1HeapRegionSize         = 0 (0.0MB)</span><br><span class="line"></span><br><span class="line">Heap Usage:</span><br><span class="line">PS Young Generation</span><br><span class="line">Eden Space:</span><br><span class="line">   capacity = 389021696 (371.0MB)</span><br><span class="line">   used     = 389021696 (371.0MB)</span><br><span class="line">   free     = 0 (0.0MB)</span><br><span class="line">   100.0% used</span><br><span class="line">From Space:</span><br><span class="line">   capacity = 218103808 (208.0MB)</span><br><span class="line">   used     = 0 (0.0MB)</span><br><span class="line">   free     = 218103808 (208.0MB)</span><br><span class="line">   0.0% used</span><br><span class="line">To Space:</span><br><span class="line">   capacity = 242745344 (231.5MB)</span><br><span class="line">   used     = 0 (0.0MB)</span><br><span class="line">   free     = 242745344 (231.5MB)</span><br><span class="line">   0.0% used</span><br><span class="line">PS Old Generation</span><br><span class="line">   capacity = 1747976192 (1667.0MB)</span><br><span class="line">   used     = 1747822160 (1666.8531036376953MB)</span><br><span class="line">   free     = 154032 (0.1468963623046875MB)</span><br><span class="line">   99.99118798066559% used</span><br></pre></td></tr></table></figure>
+
+<p>很显然，Eden区 和Old 区都耗尽了。</p>
+<p>我想知道新生代和老年代都存了些什么，使用命令<code>jmap -dump:live,format=b,file=dump.file ${pid}</code> </p>
+<p>只导出存活对象的堆栈信息</p>
+<p>大概有3个G</p>
+<p>使用工具分析一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">The class "nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions", loaded by "org.springframework.boot.loader.LaunchedURLClassLoader @ 0x7252ae050", occupies 2,099,455,296 (96.06%) bytes. The memory is accumulated in one instance of "java.util.LinkedHashMap" loaded by "&lt;system class loader&gt;".</span><br><span class="line"></span><br><span class="line">Keywords</span><br><span class="line">java.util.LinkedHashMap</span><br><span class="line">nz.net.ultraq.thymeleaf.context.extensions.IContextExtensions</span><br><span class="line">org.springframework.boot.loader.LaunchedURLClassLoader @ <span class="number">0x7252ae050</span></span><br></pre></td></tr></table></figure>
+
+<p>爆出了内存泄露风险：</p>
+<p>继续看，主要看这个<code>Accumulated Objects in Dominator Tree</code>看看对象数量：</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ge2fux0uq5j316a0gg7co.jpg" alt=""></p>
+<p>96%的空间都被 thymeleaf context占用了</p>
+<p>怀疑这个有内存泄露，这个类是使用thymeleaf的layout功能，第三方的jar包</p>
+<p>google一番，github上面已经有人爆出了类似的BUG：</p>
+<p><a href="https://github.com/ultraq/thymeleaf-layout-dialect/issues/139" target="_blank" rel="noopener">https://github.com/ultraq/thymeleaf-layout-dialect/issues/139</a></p>
+<p><a href="https://github.com/ultraq/thymeleaf-layout-dialect/issues/122" target="_blank" rel="noopener">https://github.com/ultraq/thymeleaf-layout-dialect/issues/122</a></p>
+<p>然后看帖子说，2.1.0已经解决了</p>
+<p>看了下我用的版本是2.0.1 赶紧升级了最新版本；</p>
+<p>运行一天结果：</p>
+<p><code>jmap -heap ${pid}</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">Attaching to process ID <span class="number">11332</span>, please wait...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is <span class="number">25.191</span>-b12</span><br><span class="line"></span><br><span class="line">using thread-local object allocation.</span><br><span class="line">Parallel GC with <span class="number">4</span> thread(s)</span><br><span class="line"></span><br><span class="line">Heap Configuration:</span><br><span class="line">   MinHeapFreeRatio         = <span class="number">0</span></span><br><span class="line">   MaxHeapFreeRatio         = <span class="number">100</span></span><br><span class="line">   MaxHeapSize              = <span class="number">2621440000</span> (<span class="number">2500.0</span>MB)</span><br><span class="line">   NewSize                  = <span class="number">873463808</span> (<span class="number">833.0</span>MB)</span><br><span class="line">   MaxNewSize               = <span class="number">873463808</span> (<span class="number">833.0</span>MB)</span><br><span class="line">   OldSize                  = <span class="number">1747976192</span> (<span class="number">1667.0</span>MB)</span><br><span class="line">   NewRatio                 = <span class="number">2</span></span><br><span class="line">   SurvivorRatio            = <span class="number">8</span></span><br><span class="line">   MetaspaceSize            = <span class="number">21807104</span> (<span class="number">20.796875</span>MB)</span><br><span class="line">   CompressedClassSpaceSize = <span class="number">1073741824</span> (<span class="number">1024.0</span>MB)</span><br><span class="line">   MaxMetaspaceSize         = <span class="number">17592186044415</span> MB</span><br><span class="line">   G1HeapRegionSize         = <span class="number">0</span> (<span class="number">0.0</span>MB)</span><br><span class="line"></span><br><span class="line">Heap Usage:</span><br><span class="line">PS Young Generation</span><br><span class="line">Eden Space:</span><br><span class="line">   capacity = <span class="number">829423616</span> (<span class="number">791.0</span>MB)</span><br><span class="line">   used     = <span class="number">23825784</span> (<span class="number">22.72203826904297</span>MB)</span><br><span class="line">   free     = <span class="number">805597832</span> (<span class="number">768.277961730957</span>MB)</span><br><span class="line">   <span class="number">2.8725712097399456</span>% used</span><br><span class="line">From Space:</span><br><span class="line">   capacity = <span class="number">21495808</span> (<span class="number">20.5</span>MB)</span><br><span class="line">   used     = <span class="number">17248552</span> (<span class="number">16.449501037597656</span>MB)</span><br><span class="line">   free     = <span class="number">4247256</span> (<span class="number">4.050498962402344</span>MB)</span><br><span class="line">   <span class="number">80.24146847608613</span>% used</span><br><span class="line">To Space:</span><br><span class="line">   capacity = <span class="number">22020096</span> (<span class="number">21.0</span>MB)</span><br><span class="line">   used     = <span class="number">0</span> (<span class="number">0.0</span>MB)</span><br><span class="line">   free     = <span class="number">22020096</span> (<span class="number">21.0</span>MB)</span><br><span class="line">   <span class="number">0.0</span>% used</span><br><span class="line">PS Old Generation</span><br><span class="line">   capacity = <span class="number">1747976192</span> (<span class="number">1667.0</span>MB)</span><br><span class="line">   used     = <span class="number">102638624</span> (<span class="number">97.88381958007812</span>MB)</span><br><span class="line">   free     = <span class="number">1645337568</span> (<span class="number">1569.1161804199219</span>MB)</span><br><span class="line">   <span class="number">5.8718548038439184</span>% used</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，已经正常了；</p>
+<p>继续看一下GC频率:<code>jstat -gc ${pid}</code></p>
+<p>S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT<br>21504.0 21504.0  0.0   16127.9 809984.0 493815.0 1707008.0   100273.0  112844.0 107384.9 13056.0 12026.0    149    4.369   4      1.156    5.525</p>
+<p>S0C 代表 S0 capacity S0 大小，注意单位是KB 大概21M左右</p>
+<p>S1C代表 S1 capacity S1 大小，注意单位是KB 大概21M左右</p>
+<p>S0U 代表 S0 used capacity ，S0区使用空间 同理 S1U代表 S1区使用空间</p>
+<p>同理其他, C代表初始空间 U代表使用空间，YGC 代表youngCG (count)次数，FGCT 代表 young GC (cost time)</p>
+<p>可以看到，Young GC 次数达到了149次，耗时4.369 s</p>
+<p>继续看看垃圾回收日志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T03:<span class="number">49</span>:<span class="number">51.797</span>+<span class="number">0800</span>: <span class="number">32225.690</span>: [GC (Allocation Failure)  <span class="number">926931</span>K-&gt;<span class="number">105742</span>K(<span class="number">2545152</span>K), <span class="number">0.0287966</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T03:<span class="number">57</span>:<span class="number">13.735</span>+<span class="number">0800</span>: <span class="number">32667.628</span>: [GC (Allocation Failure)  <span class="number">929038</span>K-&gt;<span class="number">106728</span>K(<span class="number">2545152</span>K), <span class="number">0.0513608</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">03</span>:<span class="number">53.071</span>+<span class="number">0800</span>: <span class="number">33066.965</span>: [GC (Allocation Failure)  <span class="number">930024</span>K-&gt;<span class="number">105097</span>K(<span class="number">2545152</span>K), <span class="number">0.0322447</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">11</span>:<span class="number">00.399</span>+<span class="number">0800</span>: <span class="number">33494.292</span>: [GC (Allocation Failure)  <span class="number">928393</span>K-&gt;<span class="number">105856</span>K(<span class="number">2545152</span>K), <span class="number">0.0323377</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">20</span>:<span class="number">46.614</span>+<span class="number">0800</span>: <span class="number">34080.507</span>: [GC (Allocation Failure)  <span class="number">929152</span>K-&gt;<span class="number">107559</span>K(<span class="number">2544640</span>K), <span class="number">0.0285097</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">29</span>:<span class="number">45.171</span>+<span class="number">0800</span>: <span class="number">34619.064</span>: [GC (Allocation Failure)  <span class="number">930855</span>K-&gt;<span class="number">106868</span>K(<span class="number">2545152</span>K), <span class="number">0.0304927</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">37</span>:<span class="number">42.922</span>+<span class="number">0800</span>: <span class="number">35096.815</span>: [GC (Allocation Failure)  <span class="number">930164</span>K-&gt;<span class="number">106172</span>K(<span class="number">2545664</span>K), <span class="number">0.0277129</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">42</span>:<span class="number">42.121</span>+<span class="number">0800</span>: <span class="number">35396.014</span>: [GC (Allocation Failure)  <span class="number">929980</span>K-&gt;<span class="number">104085</span>K(<span class="number">2545152</span>K), <span class="number">0.0260993</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">50</span>:<span class="number">59.664</span>+<span class="number">0800</span>: <span class="number">35893.557</span>: [GC (Allocation Failure)  <span class="number">927893</span>K-&gt;<span class="number">106575</span>K(<span class="number">2545664</span>K), <span class="number">0.0233603</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T04:<span class="number">57</span>:<span class="number">57.947</span>+<span class="number">0800</span>: <span class="number">36311.840</span>: [GC (Allocation Failure)  <span class="number">930383</span>K-&gt;<span class="number">106330</span>K(<span class="number">2545152</span>K), <span class="number">0.0338124</span> secs]</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T05:<span class="number">04</span>:<span class="number">59.016</span>+<span class="number">0800</span>: <span class="number">36732.909</span>: [GC (Allocation Failure)  <span class="number">930138</span>K-&gt;<span class="number">106005</span>K(<span class="number">2546176</span>K), <span class="number">0.0251955</span> secs]</span><br></pre></td></tr></table></figure>
+
+<p>很多的 YGC ，可以看到 old区分配多，但是一直使用很少，我们需要把Eden区适当的调大一些</p>
+<p>修改启动参数：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup /opt/jdk1.8.0_191/bin/java -jar -Xloggc:/opt/mb-gc.log -XX:+PrintGC -XX:+PrintGCDateStamps -XX:NewRatio=1 -XX:SurvivorRatio=6 -Xms2500m -Xmx2500m -javaagent:/opt/tingyun/tingyun-agent-java.jar /demo.jar --spring.profiles.active=online &amp;</span><br></pre></td></tr></table></figure>
+
+<p><code>jmap -heap pid</code>看下是否修改成功：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Heap Configuration:</span><br><span class="line">   MinHeapFreeRatio         = <span class="number">0</span></span><br><span class="line">   MaxHeapFreeRatio         = <span class="number">100</span></span><br><span class="line">   MaxHeapSize              = <span class="number">2621440000</span> (<span class="number">2500.0</span>MB)</span><br><span class="line">   NewSize                  = <span class="number">1310720000</span> (<span class="number">1250.0</span>MB)</span><br><span class="line">   MaxNewSize               = <span class="number">1310720000</span> (<span class="number">1250.0</span>MB)</span><br><span class="line">   OldSize                  = <span class="number">1310720000</span> (<span class="number">1250.0</span>MB)</span><br><span class="line">   NewRatio                 = <span class="number">1</span></span><br><span class="line">   SurvivorRatio            = <span class="number">6</span></span><br><span class="line">   MetaspaceSize            = <span class="number">21807104</span> (<span class="number">20.796875</span>MB)</span><br><span class="line">   CompressedClassSpaceSize = <span class="number">1073741824</span> (<span class="number">1024.0</span>MB)</span><br><span class="line">   MaxMetaspaceSize         = <span class="number">17592186044415</span> MB</span><br><span class="line">   G1HeapRegionSize         = <span class="number">0</span> (<span class="number">0.0</span>MB)</span><br><span class="line"></span><br><span class="line">Heap Usage:</span><br><span class="line">PS Young Generation</span><br><span class="line">Eden Space:</span><br><span class="line">   capacity = <span class="number">1220542464</span> (<span class="number">1164.0</span>MB)</span><br><span class="line">   used     = <span class="number">323484472</span> (<span class="number">308.4988327026367</span>MB)</span><br><span class="line">   free     = <span class="number">897057992</span> (<span class="number">855.5011672973633</span>MB)</span><br><span class="line">   <span class="number">26.503336142838204</span>% used</span><br><span class="line">From Space:</span><br><span class="line">   capacity = <span class="number">37224448</span> (<span class="number">35.5</span>MB)</span><br><span class="line">   used     = <span class="number">0</span> (<span class="number">0.0</span>MB)</span><br><span class="line">   free     = <span class="number">37224448</span> (<span class="number">35.5</span>MB)</span><br><span class="line">   <span class="number">0.0</span>% used</span><br><span class="line">To Space:</span><br><span class="line">   capacity = <span class="number">48758784</span> (<span class="number">46.5</span>MB)</span><br><span class="line">   used     = <span class="number">0</span> (<span class="number">0.0</span>MB)</span><br><span class="line">   free     = <span class="number">48758784</span> (<span class="number">46.5</span>MB)</span><br><span class="line">   <span class="number">0.0</span>% used</span><br><span class="line">PS Old Generation</span><br><span class="line">   capacity = <span class="number">1310720000</span> (<span class="number">1250.0</span>MB)</span><br><span class="line">   used     = <span class="number">85510744</span> (<span class="number">81.54940032958984</span>MB)</span><br><span class="line">   free     = <span class="number">1225209256</span> (<span class="number">1168.4505996704102</span>MB)</span><br><span class="line">   <span class="number">6.523952026367187</span>% used</span><br></pre></td></tr></table></figure>
+
+<p>修改成功，看下 <code>jstat -gc pid</code></p>
+<p>还是有FGC 和YGC：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT</span><br><span class="line"><span class="number">47616.0</span> <span class="number">36352.0</span>  <span class="number">0.0</span>    <span class="number">0.0</span>   <span class="number">1191936.0</span> <span class="number">672473.0</span> <span class="number">1280000.0</span>   <span class="number">83506.6</span>   <span class="number">98380.0</span> <span class="number">94049.5</span> <span class="number">12160.0</span> <span class="number">11320.6</span>      <span class="number">7</span>    <span class="number">0.322</span>   <span class="number">4</span>      <span class="number">0.939</span>    <span class="number">1.262</span></span><br></pre></td></tr></table></figure>
+
+<p>继续看下日志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">21</span>T10:<span class="number">56</span>:<span class="number">37.707</span>+<span class="number">0800</span>: <span class="number">17.685</span>: [<span class="function">Full <span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span>  44082K-&gt;42892<span class="title">K</span><span class="params">(<span class="number">2400256</span>K)</span>, 0.1144814 secs]</span></span><br><span class="line"><span class="function">2020-04-21T10:56:41.840+0800: 21.817: [<span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span>  884284K-&gt;49863<span class="title">K</span><span class="params">(<span class="number">2400256</span>K)</span>, 0.0497769 secs]</span></span><br><span class="line"><span class="function">2020-04-21T10:56:41.889+0800: 21.867: [Full <span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span>  49863K-&gt;30535<span class="title">K</span><span class="params">(<span class="number">2400256</span>K)</span>, 0.1049150 secs]</span></span><br><span class="line"><span class="function">2020-04-21T10:56:47.095+0800: 27.073: [<span class="title">GC</span> <span class="params">(Allocation Failure)</span>  991047K-&gt;45635<span class="title">K</span><span class="params">(<span class="number">2400256</span>K)</span>, 0.0237439 secs]</span></span><br><span class="line"><span class="function">2020-04-21T10:56:51.833+0800: 31.810: [<span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span>  841845K-&gt;56284<span class="title">K</span><span class="params">(<span class="number">2400256</span>K)</span>, 0.0595819 secs]</span></span><br><span class="line"><span class="function">2020-04-21T10:56:51.892+0800: 31.870: [Full <span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span>  56284K-&gt;53312<span class="title">K</span><span class="params">(<span class="number">2400256</span>K)</span>, 0.2826614 secs]</span></span><br><span class="line"><span class="function">2020-04-21T10:57:00.632+0800: 40.609: [<span class="title">GC</span> <span class="params">(Allocation Failure)</span>  1013824K-&gt;70909<span class="title">K</span><span class="params">(<span class="number">2400256</span>K)</span>, 0.0262383 secs]</span></span><br><span class="line"><span class="function">2020-04-21T10:57:37.503+0800: 77.480: [<span class="title">GC</span> <span class="params">(Allocation Failure)</span>  1031421K-&gt;85407<span class="title">K</span><span class="params">(<span class="number">2513920</span>K)</span>, 0.0557805 secs]</span></span><br><span class="line"><span class="function">2020-04-21T11:00:13.790+0800: 233.767: [<span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span>  715074K-&gt;89727<span class="title">K</span><span class="params">(<span class="number">2508288</span>K)</span>, 0.0624448 secs]</span></span><br><span class="line"><span class="function">2020-04-21T11:00:13.853+0800: 233.830: [Full <span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span>  89727K-&gt;83506<span class="title">K</span><span class="params">(<span class="number">2508288</span>K)</span>, 0.4372935 secs]</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到是由于Metadata GC Threshold触发了FGC；MetaspaceSize 太小了。继续修改，增加参数：</p>
+<p><code>-XX:MetaspaceSize=128M</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup /opt/jdk1.8.0_191/bin/java -jar -Xloggc:/opt/mb-gc.log -XX:+PrintGC -XX:+PrintGCDateStamps -XX:NewRatio=1 -XX:SurvivorRatio=6 -XX:MetaspaceSize=128M -Xms2500m -Xmx2500m -javaagent:/opt/tingyun/tingyun-agent-java.jar /demo.jar --spring.profiles.active=online &amp;</span><br></pre></td></tr></table></figure>
+
+<p>好了，GC基本没有，跑段时间在看</p>
+
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="http://blog.onenavigation.com/2020/04/22/Thymeleaf-Layout-GC-Error/" data-id="ck9avewrh0000n8s69xkxa4h0" class="article-share-link">
+                                            分享
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+    </article>
+    
+  
+    
+  </section>
+</div>
+
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-bar-chart"></i> <span id="busuanzi_value_site_pv"></span></li>
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+</ul>
+    </div>
+    <ul class="list-inline">
+      <li>&copy; 2020 frank0&#39;s Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean" target="_blank" rel="noopener">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="frank0&#39;s Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+
+</body>
+</html>
