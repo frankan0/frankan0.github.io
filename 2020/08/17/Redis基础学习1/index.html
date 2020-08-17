@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Redis基础学习1 |
+    
+    frank0&#39;s Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="frank0's Blog" type="application/atom+xml">
+</head>
+
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-Redis基础学习1" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      Redis基础学习1
+    </h1>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2020/08/17/Redis%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A01/" class="article-date">
+  <time datetime="2020-08-17T08:36:49.000Z" itemprop="datePublished">2020-08-17</time>
+</a>
+                            
+                    </div>
+                    
+
+                        
+                            
+    <div class="tocbot"></div>
+
+
+
+
+
+                                
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <blockquote>
+<p>最近重温redis基础知识的学习随笔，随便写写</p>
+</blockquote>
+<a id="more"></a>
+
+<p>redis本质上是一个hash表，复杂度为O(1);</p>
+<p>Key 一般是个String类型，Value可以包含多种类型:String、List、Hash、SortedSet、Set；github上有人对redis3.0做了注释，有空可以看看源码：<a href="https://github.com/frankan0/redis-3.0-annotated/blob/unstable/src/dict.h" target="_blank" rel="noopener">redis3.0源码注释</a></p>
+<img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/20200817154827-20200817164744005.png" style="zoom:50%;" />
+
+<p>具体定义的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//字典定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span>  <span class="title">dict</span>&#123;</span></span><br><span class="line">    dictType *type;  <span class="comment">//type和privdata是针对不同类型的键值对，为创建多态字典而设置的</span></span><br><span class="line">    <span class="keyword">void</span> *privdata;</span><br><span class="line">    dictht ht[<span class="number">2</span>];  <span class="comment">//两个hashtable，用于存储和rehash</span></span><br><span class="line">    <span class="keyword">long</span> rehashidx;  <span class="comment">//如果没有进行rehash，则值为-1，否则，rehash表示rehash进行到的索引位置</span></span><br><span class="line">    unsigning <span class="keyword">long</span> iterators;</span><br><span class="line">&#125;dict;</span><br><span class="line"></span><br><span class="line"><span class="comment">//哈希表定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">    dictEntry **table;  <span class="comment">//指针，指向一个哈希桶bucket</span></span><br><span class="line">    unsigning <span class="keyword">long</span> <span class="built_in">size</span>;  <span class="comment">//哈希表的大小</span></span><br><span class="line">    unsigning <span class="keyword">long</span> sizemask;  <span class="comment">//总是size-1，这个值和哈希值一起决定元素应该定位到桶中的什么位置</span></span><br><span class="line">    unsigning <span class="keyword">long</span> used;  <span class="comment">//已使用的桶数量</span></span><br><span class="line">&#125;dictht;</span><br><span class="line"></span><br><span class="line"><span class="comment">//具体键值对定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span>&#123;</span></span><br><span class="line">    <span class="keyword">void</span> *key;   <span class="comment">//键值</span></span><br><span class="line">    <span class="keyword">union</span>&#123;</span><br><span class="line">        <span class="keyword">void</span> *val;  <span class="comment">//value值</span></span><br><span class="line">        unint64_tu64;</span><br><span class="line">        int64_ts64;</span><br><span class="line">    &#125;v;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span>  <span class="comment">//指向下一个键值对的指针，用于解决哈希冲突问题</span></span><br><span class="line">&#125;dictEntry;</span><br></pre></td></tr></table></figure>
+
+<p>在这个大的hash表中，实际上Value都存储的是指针；</p>
+<p>本质上是大的Hash表，就有个通用的问题：（类似Java的hashMap）</p>
+<ol>
+<li>如何解决hash冲突</li>
+<li>何时进行扩容</li>
+<li>如何扩容Hash表</li>
+</ol>
+<h4 id="如果解决hash冲突？"><a href="#如果解决hash冲突？" class="headerlink" title="如果解决hash冲突？"></a>如果解决hash冲突？</h4><p>跟Java的hashMap一样，redis采用链式hash解决hash冲突，如果存在相同的KEY，则在hash桶中，增加一个节点，如图：</p>
+<img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/20200817155047-20200817164810911.png" style="zoom:50%;" />
+
+<p>当数据越来越大，随之而来的是冲突越来越多，这个链表则会越来越长，此时，redis会进行hash桶的扩容，俗称“rehash”;</p>
+<p>Java里面的HashMap也有这个操作，不过，Java8在内部做了一个优化，当冲突链表超过8个时，会转化成红黑树，有个”树化“的过程。</p>
+<h4 id="何时进行扩容？"><a href="#何时进行扩容？" class="headerlink" title="何时进行扩容？"></a>何时进行扩容？</h4><p>Java里面有个负载因子，默认为0.75，当大于这个负载因子时，hashMap就进行扩容。</p>
+<p>负载因子 = 哈希表保存的KEY的数量 / 哈希表的大小</p>
+<p>redis中，这个跟hashMap类似，超过阈值时进行扩容</p>
+<h4 id="如何扩容hash表？"><a href="#如何扩容hash表？" class="headerlink" title="如何扩容hash表？"></a>如何扩容hash表？</h4><p>Java中的HashMap扩容是直接进行复制。而redis中，则是”渐进式扩容”可以看到上面 字典的定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//字典定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span>  <span class="title">dict</span>&#123;</span></span><br><span class="line">    dictType *type;  <span class="comment">//type和privdata是针对不同类型的键值对，为创建多态字典而设置的</span></span><br><span class="line">    <span class="keyword">void</span> *privdata;</span><br><span class="line">    dictht ht[<span class="number">2</span>];  <span class="comment">//两个hashtable，用于存储和rehash</span></span><br><span class="line">    <span class="keyword">long</span> rehashidx;  <span class="comment">//如果没有进行rehash，则值为-1，否则，rehash表示rehash进行到的索引位置</span></span><br><span class="line">    unsigning <span class="keyword">long</span> iterators;</span><br><span class="line">&#125;dict;</span><br></pre></td></tr></table></figure>
+
+<p>定义了两个hashtable，一个hashtable正常处理业务逻辑，另外一个就是在rehash时，需要使用的hashtable。</p>
+<ul>
+<li><p>处理请求时进行rehash的搬运操作</p>
+<p>每次请求时，如果正在rehash操作，则本次请求中，将本次查询的hash槽进行搬运。</p>
+</li>
+<li><p>redis定时进行rehash的搬运操作</p>
+<p>定时的进行rehash操作，这个只有在服务器空闲时进行，且每次只操作100个槽，每次不超过1ms</p>
+</li>
+</ul>
+<p>这样redis就完成了，渐进式的rehash操作。</p>
+<p>redis的字典表跟Java的hashMap结构还是有很多相似之处，有时候可以放在一个维度上进行对比，加深理解，建立网状的知识结构，后面你就会发现很多其实是相同的，比如RPC，消息队列，数据库有很多地方都是相同的，怎么进行通信，如果存储数据，怎么实现两阶段提交等等</p>
+
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://frank0.top/2020/08/17/Redis%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A01/" data-id="ckdya1zd5000017s6eqq5782r" class="article-share-link">
+                                            分享
+                                        </a>
+                                        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis-hash/" rel="tag">redis hash</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+        
+  <nav class="article-nav">
+    
+    
+      <a href="/2020/05/29/socks5%E5%8D%8F%E8%AE%AE%E4%B8%8E%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0/" class="article-nav-link">
+        <strong class="article-nav-caption">后一篇</strong>
+        <div class="article-nav-title">socks5协议与客户端简单实现</div>
+      </a>
+    
+  </nav>
+
+
+            
+
+                
+                    
+    <div class="vcomments" id="vcomments"></div>
+    
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+
+        <script>
+            new Valine({
+                el: '#vcomments',
+                appId: 'Gh2oOlBjwQgEJQvtveG690Ko-gzGzoHsz',
+                appKey: 'oX17NmUs7sFsGaG1Tgb7Nc9g',
+                notify: 'false',
+                verify: 'true',
+                avatar: 'mp',
+                pageSize: '10',
+                placeholder: '请输入...'
+            })
+        </script>
+        
+                        
+                            
+
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
+    </div>
+    <ul class="list-inline">
+      <li>&copy; 2020 frank0&#39;s Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean" target="_blank" rel="noopener">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="frank0&#39;s Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+
+</body>
+</html>
