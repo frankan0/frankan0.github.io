@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://frank0.top/"/>
-  <updated>2020-08-17T08:49:30.106Z</updated>
+  <updated>2020-08-21T09:38:02.509Z</updated>
   <id>https://frank0.top/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis基础2_为什么选择单线程</title>
+    <link href="https://frank0.top/2020/08/21/Redis%E5%9F%BA%E7%A1%802-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9%E5%8D%95%E7%BA%BF%E7%A8%8B/"/>
+    <id>https://frank0.top/2020/08/21/Redis%E5%9F%BA%E7%A1%802-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9%E5%8D%95%E7%BA%BF%E7%A8%8B/</id>
+    <published>2020-08-21T09:29:28.000Z</published>
+    <updated>2020-08-21T09:38:02.509Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>最近重温redis基础知识的学习随笔，随便写写</p></blockquote><a id="more"></a><p>我们都知道Redis是单线程模型的内存KV数据库（网络IO与键值对读写单线程），可是为啥Redis选择了单线程，现在大多数服务器都是64G+12核心左右，为什么Redis选择了单线程？</p><h4 id="多线程带来什么问题？"><a href="#多线程带来什么问题？" class="headerlink" title="多线程带来什么问题？"></a>多线程带来什么问题？</h4><p>平常做Java开发,都涉及到多线程,直观的感觉,多线程比单线程快,其实当线程数多到一定程度,执行效率可能还没有单线程快。</p><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/20200820161046.png" style="zoom:50%;" /><p>多线程也分应用场景</p><p>计算型操作，多线程用起来相对比较高效</p><p>IO型操作，多线程用起来提升不了多大性能</p><h5 id="线程模型设计比单线程模型复杂"><a href="#线程模型设计比单线程模型复杂" class="headerlink" title="线程模型设计比单线程模型复杂"></a>线程模型设计比单线程模型复杂</h5><p>多线程模型涉及到共享数据，锁的粒度大小，如果设置的不合理都会导致效率不高；</p><h5 id="多线程线程切换带来的成本"><a href="#多线程线程切换带来的成本" class="headerlink" title="多线程线程切换带来的成本"></a>多线程线程切换带来的成本</h5><p>多线程切换时有一定的性能损耗，即使不一般不大，但是也会有一定影响</p><h5 id="不易调试与维护"><a href="#不易调试与维护" class="headerlink" title="不易调试与维护"></a>不易调试与维护</h5><p>多线程模型，引入了并发，多线程代码降低了代码的可读性与可维护性</p><h4 id="Redis单线程为什么快？"><a href="#Redis单线程为什么快？" class="headerlink" title="Redis单线程为什么快？"></a>Redis单线程为什么快？</h4><h5 id="Redis是内存数据库"><a href="#Redis是内存数据库" class="headerlink" title="Redis是内存数据库"></a>Redis是内存数据库</h5><p>大部分Redis操作都是在内存上完成</p><h5 id="Redis优秀的存储数据结构"><a href="#Redis优秀的存储数据结构" class="headerlink" title="Redis优秀的存储数据结构"></a>Redis优秀的存储数据结构</h5><p>Redis的内部的数据结构时间复杂度大多是 O(logN) O(1)，范围扫描等时间复杂度是O(N)</p><h5 id="Redis使用了多路复用的IO模型"><a href="#Redis使用了多路复用的IO模型" class="headerlink" title="Redis使用了多路复用的IO模型"></a>Redis使用了多路复用的IO模型</h5><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200820165211392.png" alt="image-20200820165211392" style="zoom:50%;" /><p>多路IO复用极大的提高了Redis的IO效率，可以看到图中，连接绑定上之后，会有多种事件，所有的事件都存放到了Redis一个队列中，事件出队，Redis使用一个线程来处理具体的事件。</p><p>当然，任何架构都不是完美的，可以从上图的IO模型看到，这个队列是Redis的性能瓶颈。</p><ol><li>队列中的任何事件，如果处理事件（请求）耗时，则整个Redis服务会受到影响</li><li>Big Key 会损耗内存</li><li>复杂度高的命令，对redis影响比较大 O(N),如：keys *  SORT等</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;最近重温redis基础知识的学习随笔，随便写写&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+    
+  </entry>
   
   <entry>
     <title>Redis基础学习1</title>

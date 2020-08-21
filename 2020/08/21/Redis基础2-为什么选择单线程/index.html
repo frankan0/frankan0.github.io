@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Redis基础2_为什么选择单线程 |
+    
+    frank0&#39;s Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="frank0's Blog" type="application/atom+xml">
+</head>
+
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-Redis基础2-为什么选择单线程" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      Redis基础2_为什么选择单线程
+    </h1>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2020/08/21/Redis%E5%9F%BA%E7%A1%802-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9%E5%8D%95%E7%BA%BF%E7%A8%8B/" class="article-date">
+  <time datetime="2020-08-21T09:29:28.000Z" itemprop="datePublished">2020-08-21</time>
+</a>
+                            
+                    </div>
+                    
+
+                        
+                            
+    <div class="tocbot"></div>
+
+
+
+
+
+                                
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <blockquote>
+<p>最近重温redis基础知识的学习随笔，随便写写</p>
+</blockquote>
+<a id="more"></a>
+
+
+<p>我们都知道Redis是单线程模型的内存KV数据库（网络IO与键值对读写单线程），可是为啥Redis选择了单线程，现在大多数服务器都是64G+12核心左右，为什么Redis选择了单线程？</p>
+<h4 id="多线程带来什么问题？"><a href="#多线程带来什么问题？" class="headerlink" title="多线程带来什么问题？"></a>多线程带来什么问题？</h4><p>平常做Java开发,都涉及到多线程,直观的感觉,多线程比单线程快,其实当线程数多到一定程度,执行效率可能还没有单线程快。</p>
+<img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/20200820161046.png" style="zoom:50%;" />
+
+<p>多线程也分应用场景</p>
+<p>计算型操作，多线程用起来相对比较高效</p>
+<p>IO型操作，多线程用起来提升不了多大性能</p>
+<h5 id="线程模型设计比单线程模型复杂"><a href="#线程模型设计比单线程模型复杂" class="headerlink" title="线程模型设计比单线程模型复杂"></a>线程模型设计比单线程模型复杂</h5><p>多线程模型涉及到共享数据，锁的粒度大小，如果设置的不合理都会导致效率不高；</p>
+<h5 id="多线程线程切换带来的成本"><a href="#多线程线程切换带来的成本" class="headerlink" title="多线程线程切换带来的成本"></a>多线程线程切换带来的成本</h5><p>多线程切换时有一定的性能损耗，即使不一般不大，但是也会有一定影响</p>
+<h5 id="不易调试与维护"><a href="#不易调试与维护" class="headerlink" title="不易调试与维护"></a>不易调试与维护</h5><p>多线程模型，引入了并发，多线程代码降低了代码的可读性与可维护性</p>
+<h4 id="Redis单线程为什么快？"><a href="#Redis单线程为什么快？" class="headerlink" title="Redis单线程为什么快？"></a>Redis单线程为什么快？</h4><h5 id="Redis是内存数据库"><a href="#Redis是内存数据库" class="headerlink" title="Redis是内存数据库"></a>Redis是内存数据库</h5><p>大部分Redis操作都是在内存上完成</p>
+<h5 id="Redis优秀的存储数据结构"><a href="#Redis优秀的存储数据结构" class="headerlink" title="Redis优秀的存储数据结构"></a>Redis优秀的存储数据结构</h5><p>Redis的内部的数据结构时间复杂度大多是 O(logN) O(1)，范围扫描等时间复杂度是O(N)</p>
+<h5 id="Redis使用了多路复用的IO模型"><a href="#Redis使用了多路复用的IO模型" class="headerlink" title="Redis使用了多路复用的IO模型"></a>Redis使用了多路复用的IO模型</h5><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200820165211392.png" alt="image-20200820165211392" style="zoom:50%;" />
+
+<p>多路IO复用极大的提高了Redis的IO效率，可以看到图中，连接绑定上之后，会有多种事件，所有的事件都存放到了Redis一个队列中，事件出队，Redis使用一个线程来处理具体的事件。</p>
+<p>当然，任何架构都不是完美的，可以从上图的IO模型看到，这个队列是Redis的性能瓶颈。</p>
+<ol>
+<li>队列中的任何事件，如果处理事件（请求）耗时，则整个Redis服务会受到影响</li>
+<li>Big Key 会损耗内存</li>
+<li>复杂度高的命令，对redis影响比较大 O(N),如：keys *  SORT等</li>
+</ol>
+
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://frank0.top/2020/08/21/Redis%E5%9F%BA%E7%A1%802-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9%E5%8D%95%E7%BA%BF%E7%A8%8B/" data-id="cke41a3z20000c1fybymf3479" class="article-share-link">
+                                            分享
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+        
+  <nav class="article-nav">
+    
+    
+      <a href="/2020/08/17/Redis%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A01/" class="article-nav-link">
+        <strong class="article-nav-caption">后一篇</strong>
+        <div class="article-nav-title">Redis基础学习1</div>
+      </a>
+    
+  </nav>
+
+
+            
+
+                
+                    
+    <div class="vcomments" id="vcomments"></div>
+    
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+
+        <script>
+            new Valine({
+                el: '#vcomments',
+                appId: 'Gh2oOlBjwQgEJQvtveG690Ko-gzGzoHsz',
+                appKey: 'oX17NmUs7sFsGaG1Tgb7Nc9g',
+                notify: 'false',
+                verify: 'true',
+                avatar: 'mp',
+                pageSize: '10',
+                placeholder: '请输入...'
+            })
+        </script>
+        
+                        
+                            
+
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
+    </div>
+    <ul class="list-inline">
+      <li>&copy; 2020 frank0&#39;s Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean" target="_blank" rel="noopener">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="frank0&#39;s Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+
+</body>
+</html>
