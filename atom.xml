@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://frank0.top/"/>
-  <updated>2020-08-21T09:38:02.509Z</updated>
+  <updated>2020-09-10T08:57:35.205Z</updated>
   <id>https://frank0.top/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>一次团队内的产品技术分享</title>
+    <link href="https://frank0.top/2020/09/10/%E4%B8%80%E6%AC%A1%E5%9B%A2%E9%98%9F%E5%86%85%E7%9A%84%E4%BA%A7%E5%93%81%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"/>
+    <id>https://frank0.top/2020/09/10/%E4%B8%80%E6%AC%A1%E5%9B%A2%E9%98%9F%E5%86%85%E7%9A%84%E4%BA%A7%E5%93%81%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/</id>
+    <published>2020-09-10T08:18:44.000Z</published>
+    <updated>2020-09-10T08:57:35.205Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>记录：一次分享PPT制作</p></blockquote><a id="more"></a><h4 id="利用脑图整理大纲"><a href="#利用脑图整理大纲" class="headerlink" title="利用脑图整理大纲"></a>利用脑图整理大纲</h4><p>这几天需要给团队做一次产品技术分享，主要是分享一下我们团队做的一个产品《XXX营销系统》，这个产品是一个很常规的产品，可以满足大多数营销场景。</p><p>为了做这个PPT 我很是苦恼，不知道从何下手也不知道如何进行制定演讲内容，内容与内容之间如何进行衔接，最后我决定先列出要讲的大纲，然后分别制定好每个PPT需要演讲的内容，然后才是PPT的制作，对于没有艺术功底的我来说也是一项繁重的任务。</p><p>首先，列出需要演讲的内容，我使用脑图来梳理我需要演讲的内容：</p><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200910160821116-9727644.png" alt="image-20200910160821116" style="zoom:50%;" /><p>使用脑图很方便的列出我需要讲的大纲，有了大纲我才可以继续梳理，每个大纲需要将什么内容；同时我也会思考每个点如何进行承上启下。有了大概，我继续细化每个点需要讲的内容，由于涉及公司内容，这里就不贴了。</p><h4 id="选择合适图形与图表"><a href="#选择合适图形与图表" class="headerlink" title="选择合适图形与图表"></a>选择合适图形与图表</h4><p>大纲差不多整理完了，那就可以进行下一步了，选择一个具有科技股的模板，一般我优先选择蓝色的。</p><p>推荐网址：<a href="http://www.ypppt.com/" target="_blank" rel="noopener">http://www.ypppt.com/</a> </p><p>里面有个模块不错：<a href="http://www.ypppt.com/tubiao/" target="_blank" rel="noopener">http://www.ypppt.com/tubiao/</a>  图标模块，当我不知道如何展示一个内容的时候，我会去这里找灵感。</p><p>加上自身的逻辑，很容易找到图表的展示方式。</p><p>在制作的过程中，有些我们需要一些图标，最好选择矢量图，推荐网址：<a href="https://www.iconfont.cn/home/index?spm=a313x.7781069.1998910419.2" target="_blank" rel="noopener">https://www.iconfont.cn/home/index?spm=a313x.7781069.1998910419.2</a> 阿里巴巴的图标搜索</p><h4 id="克服语言障碍进行试讲"><a href="#克服语言障碍进行试讲" class="headerlink" title="克服语言障碍进行试讲"></a>克服语言障碍进行试讲</h4><p>PPT 制作完成之后，我自己给领导进行了一次试讲，领导会点评，有个好方法是全程录音，因为事后可能需要总结和修改，你通过录音能够复盘，哪里讲的不好，哪里需要进行着重渲染，上下文怎么衔接，是否有遗漏的地方，都可以通过复盘来找出来。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;记录：一次分享PPT制作&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+    
+  </entry>
   
   <entry>
     <title>Redis基础2_为什么选择单线程</title>
