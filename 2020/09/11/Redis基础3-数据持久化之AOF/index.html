@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Redis基础3_数据持久化之AOF |
+    
+    frank0&#39;s Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<script src="/js/pace.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="frank0's Blog" type="application/atom+xml">
+</head>
+
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-Redis基础3-数据持久化之AOF" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      Redis基础3_数据持久化之AOF
+    </h1>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2020/09/11/Redis%E5%9F%BA%E7%A1%803-%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E4%B9%8BAOF/" class="article-date">
+  <time datetime="2020-09-11T09:06:06.000Z" itemprop="datePublished">2020-09-11</time>
+</a>
+                            
+                    </div>
+                    
+
+                        
+                            
+    <div class="tocbot"></div>
+
+
+
+
+
+                                
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <blockquote>
+<p> Redis有两种数据持久化的方式，他们都有各自的特点，写下AOF持久化的总结。</p>
+</blockquote>
+<a id="more"></a>
+
+<h3 id="AOF持久化"><a href="#AOF持久化" class="headerlink" title="AOF持久化"></a>AOF持久化</h3><p>AOF是Append Only File 的简称，AOF是利用日志来记录Redis的操作命令，然后在使用他恢复Redis数据。</p>
+<p>提到日志，有两个很经典的应用场景，MySQL的两阶段提交，就是利用日志来实现的，还有消息队列如rocketMQ也是利用写日志来记录数据，但是有个明显的区别，他们一般是先写日志，后刷盘这样能够避免数据丢失，<strong>但是Redis不一样，Redis是先执行命令后写日志</strong>。</p>
+<img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200911160600899.png" alt="image-20200911160600899" style="zoom:50%;" />
+
+<p>如果这时候，Redis写了内存，还没有写日志，挂掉了怎么办？数据还能恢复吗？</p>
+<p>答案是不能，所以会有数据丢失的风险。</p>
+<p>那为什么Redis会选择这种方式？</p>
+<ol>
+<li>由于AOF日志记录的是Redis的命令，后写日志避免了AOF日志记录错误的命令（为什么不检查正确后在写日志？）</li>
+<li>由于Redis处理数据时是单线程，如果先写日志，当磁盘有性能问题时，会有阻塞当前请求的线程的风险，但是这种风险避免不了。为啥？因为后写日志，如果你磁盘有问题，会影响下次请求。（写AOF日志是在主线程中完成）</li>
+</ol>
+<p><strong>所以，为了避免磁盘引发的风险，Redis提供了三种AOF写回策略。</strong></p>
+<p>appendfsync 配置：</p>
+<p>Always：每次执行完命令，立刻写AOF日志到磁盘</p>
+<p>Everysec： 每秒写回，命令执行完，先把AOF日志写到内存缓冲区，每隔一秒把内存缓存区的AOF日志写到磁盘</p>
+<p>No： 操作系统控制写回，命令执行完，先把AOF日志写到内存缓冲区，由操作系统决定何时写回磁盘。</p>
+<blockquote>
+<p><strong>操作系统何时写回磁盘？</strong></p>
+<p>在现代操作系统中， 当用户调用 <code>write</code> 函数， 将一些数据写入到文件的时候， 操作系统通常会将写入数据暂时保存在一个内存缓冲区里面， 等到缓冲区的空间被填满、或者超过了指定的时限之后， 才真正地将缓冲区中的数据写入到磁盘里面。也就是说如果你不强制调用系统的同步函数，这个权限就交给操作系统了。</p>
+<p>这种做法虽然提高了效率， 但也为写入数据带来了安全问题， 因为如果计算机发生停机， 那么保存在内存缓冲区里面的写入数据将会丢失。</p>
+<p>为此， 系统提供了 <code>fsync</code> 和 <code>fdatasync</code> 两个同步函数， 它们可以强制让操作系统立即将缓冲区中的数据写入到硬盘里面， 从而确保写入数据的安全性。 也就是说，Always和Everysec都调用 同步函数。</p>
+</blockquote>
+<p>比较一下三种方式：</p>
+<img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200911162720796.png" alt="image-20200911162720796" style="zoom:50%;" />
+
+<p>这时候，如果AOF开启，这明显有个问题，随着Redis系统的运行，AOF文件会越来越大，当发生系统宕机时，AOF恢复是很头痛的问题，所以Redis引入了<strong>AOF重写机制</strong>。</p>
+<p>AOF重写机制，实际上就是把多个命令变成了一个命令，然后写入AOF文件，比如有6个命令对 test 这个key做了修改，AOF重写机制会选择最新的 test key的状态 写入AOF文件。</p>
+<img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200911163232926.png" alt="image-20200911163232926" style="zoom:50%;" />
+
+<p><strong>那Redis何时进行AOF重写？</strong></p>
+<ol>
+<li><p>手动触发，使用<code>BGREWRITEAOF</code></p>
+</li>
+<li><p>服务器自动进行重写</p>
+<blockquote>
+<p>服务器在AOF功能开启的情况下，会维持以下三个变量：</p>
+<ol>
+<li>记录当前AOF文件大小的变量<code>aof_current_size</code></li>
+<li>记录最后一次AOF重写之后，AOF文件大小的变量<code>aof_rewrite_base_size</code></li>
+<li>增长百分比变量<code>aof_rewrite_perc</code>。</li>
+</ol>
+<p>每次当<code>serverCron</code>（服务器周期性操作函数）函数执行时，它会检查以下条件是否全部满足，如果全部满足的话，就触发自动的AOF重写操作：</p>
+<ol>
+<li>没有BGSAVE命令（RDB持久化）/AOF持久化在执行</li>
+<li>没有BGREWRITEAOF在进行</li>
+<li>当前AOF文件大小要大于<code>server.aof_rewrite_min_size</code>（默认为1MB），或者在<code>redis.conf</code>配置了<code>auto-aof-rewrite-min-size</code>大小</li>
+<li>当前AOF文件大小和最后一次重写后的大小之间的比率等于或者大于指定的增长百分比（在配置文件设置了<code>auto-aof-rewrite-percentage</code>参数，不设置默认为100%）</li>
+</ol>
+<p>如果前面三个条件都满足，并且当前AOF文件大小比最后一次AOF重写时的大小要大于指定的百分比，那么触发自动AOF重写</p>
+</blockquote>
+</li>
+</ol>
+<p><strong>AOF重写是否会阻塞主线程处理请求的命令？</strong></p>
+<p>答案是不会阻塞主线程，由主线程fork出子线程完成 AOF的重写。</p>
+<p>每次执行AOF重写时，主线程会fork出 <code>bgrewriteaof</code> 线程（注意，由于是fork当内存数据较多时，虽然不会拷贝父进程的内存数据，但是会拷贝父进程的空间内存页表，我们可以在 Info stats 统计中查询 latestforkusec 指标获取最近一次 fork 操作耗时，单位微秒），此时  <code>bgrewriteaof</code> 线程会共享主线程的内存数据，内存数据时最新的，那么现在子线程就可以生产一个 AOF重写日志（<strong>此时访问父进程的数据，是把全部内存数据都生产AOF重写日志吗？</strong>）</p>
+<p>此时，有个问题，主线程还可以继续处理请求，可能主线程会更新内存中的数据，所以还需要依赖另外一个日志来处理 主线程更新后的数据：这时候还会生产主线程操作的AOF重写日志，待主线程完成操作后，再将子线程的AOF重写日志与主线程的重写日志合并。</p>
+<img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200911165649730.png" alt="image-20200911165649730" style="zoom:50%;" />
+
+
+
+
+
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://frank0.top/2020/09/11/Redis%E5%9F%BA%E7%A1%803-%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E4%B9%8BAOF/" data-id="ckey0ptwl0000dtvfhi6c8s4i" class="article-share-link">
+                                            分享
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+        
+  <nav class="article-nav">
+    
+    
+      <a href="/2020/09/10/%E4%B8%80%E6%AC%A1%E5%9B%A2%E9%98%9F%E5%86%85%E7%9A%84%E4%BA%A7%E5%93%81%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/" class="article-nav-link">
+        <strong class="article-nav-caption">后一篇</strong>
+        <div class="article-nav-title">一次团队内的产品技术分享</div>
+      </a>
+    
+  </nav>
+
+
+            
+
+                
+                    
+    <div class="vcomments" id="vcomments"></div>
+    
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+
+        <script>
+            new Valine({
+                el: '#vcomments',
+                appId: 'Gh2oOlBjwQgEJQvtveG690Ko-gzGzoHsz',
+                appKey: 'oX17NmUs7sFsGaG1Tgb7Nc9g',
+                notify: 'false',
+                verify: 'true',
+                avatar: 'mp',
+                pageSize: '10',
+                placeholder: '请输入...'
+            })
+        </script>
+        
+                        
+                            
+
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
+    </div>
+    <ul class="list-inline">
+      <li>&copy; 2020 frank0&#39;s Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean" target="_blank" rel="noopener">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="frank0&#39;s Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+  
+<script src="/js/tocbot.min.js"></script>
+
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
+
+
+
+<script src="/js/ocean.js"></script>
+
+
+</body>
+</html>
