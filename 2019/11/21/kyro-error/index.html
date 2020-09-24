@@ -1,79 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>
-    kyro序列化错误 |
-    
-    frank0&#39;s Blog</title>
-  
-    <link rel="shortcut icon" href="/favicon.ico">
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.1.1" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.1.1" type="image/png" sizes="32x32"><meta name="description" content="Kryo序列化时报错：java.lang.ArrayIndexOutOfBoundsException、Buffer overflow 序列化二进制文件不完整">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kyro序列化错误">
+<meta property="og:url" content="https://frank0.top/2019/11/21/kyro-error/index.html">
+<meta property="og:site_name" content="frank0&#39;s Blog">
+<meta property="og:description" content="Kryo序列化时报错：java.lang.ArrayIndexOutOfBoundsException、Buffer overflow 序列化二进制文件不完整">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-11-21T10:59:09.000Z">
+<meta property="article:modified_time" content="2020-04-22T11:00:36.565Z">
+<meta property="article:author" content="frank0">
+<meta name="twitter:card" content="summary"><title>kyro序列化错误 | frank0's Blog</title><link ref="canonical" href="https://frank0.top/2019/11/21/kyro-error/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.1.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":false,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: false,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
 
-  
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
-  
-  
-<script src="/js/pace.min.js"></script>
-
-<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="frank0's Blog" type="application/atom+xml">
-</head>
-
-<body>
-<main class="content">
-  <section class="outer">
-  <article id="post-kyro-error" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h1 class="article-title" itemprop="name">
-      kyro序列化错误
-    </h1>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2019/11/21/kyro-error/" class="article-date">
-  <time datetime="2019-11-21T10:59:09.000Z" itemprop="datePublished">2019-11-21</time>
-</a>
-                            
-                    </div>
-                    
-
-                        
-                            
-
-
-
-
-                                
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                                    <p>Kryo序列化时报错：java.lang.ArrayIndexOutOfBoundsException、Buffer overflow</p>
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="frank0's Blog" type="application/atom+xml">
+</head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner header-inner--height header-inner--bgcolor"><nav class="header-nav header-nav--sticky"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="javascript:;" onclick="return false;"><span class="header-nav-menu-item__icon"><i class="fab fa-expeditedssl"></i></span><span class="header-nav-menu-item__text">实验室</span></a><div class="header-nav-submenu"><div class="header-nav-submenu-item"><a class="header-nav-submenu-item__link" href="https://www.p2m.top" target="_blank" rel="noopener"><span class="header-nav-submenu-item__icon"><i class="fab fa-pushed"></i></span><span class="header-nav-submenu-item__text">P2M</span></a></div></div></div></div><div class="header-nav-search"><span class="header-nav-search__icon"><i class="fas fa-search"></i></span><span class="header-nav-search__text">搜索</span></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">kyro序列化错误</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2019-11-21</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2020-04-22</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">1.2k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">10分</span></span><span class="post-meta-item post-meta-item--visitors"><span class="post-meta-item__icon"><i class="fas fa-eye"></i></span><span class="post-meta-item__info">阅读次数</span><span class="post-meta-item__value" id="busuanzi_value_page_pv"></span></span></div></header><div class="post-body"><p>Kryo序列化时报错：java.lang.ArrayIndexOutOfBoundsException、Buffer overflow</p>
 <p>序列化二进制文件不完整</p>
 <a id="more"></a>
 
@@ -97,17 +56,17 @@
 </ol>
 <p>池化技术：</p>
 <p>数据库连接池，http连接池等；重复利用；</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 初始化kryo池</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> KryoPool kryoPool = <span class="keyword">new</span> KryoPool.Builder(<span class="keyword">new</span> KryoFactory() &#123;</span><br><span class="line">       <span class="function"><span class="keyword">public</span> Kryo <span class="title">create</span><span class="params">()</span> </span>&#123;</span><br><span class="line">           Kryo kryo = <span class="keyword">new</span> Kryo();</span><br><span class="line">           kryo.setInstantiatorStrategy(<span class="keyword">new</span> Kryo.DefaultInstantiatorStrategy(<span class="keyword">new</span> StdInstantiatorStrategy()));</span><br><span class="line">           <span class="keyword">return</span> kryo;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;).softReferences().build();</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 初始化kryo池</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> KryoPool kryoPool = <span class="keyword">new</span> KryoPool.Builder(<span class="keyword">new</span> KryoFactory() &#123;</span><br><span class="line">       <span class="function"><span class="keyword">public</span> Kryo <span class="title">create</span><span class="params">()</span> </span>&#123;</span><br><span class="line">           Kryo kryo = <span class="keyword">new</span> Kryo();</span><br><span class="line">           kryo.setInstantiatorStrategy(<span class="keyword">new</span> Kryo.DefaultInstantiatorStrategy(<span class="keyword">new</span> StdInstantiatorStrategy()));</span><br><span class="line">           <span class="keyword">return</span> kryo;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;).softReferences().build();</span><br></pre></td></tr></table></div></figure>
 
 <p>Kryo池化，主要使用一个软引用队列，如果队列没有则使用工厂创建一个，如果队列有则从队列出队给使用者使用；</p>
 <p>使用者使用完之后，进行释放，则kryo对象入队；这样保证kryo的重复利用；</p>
 <p>自动扩容：</p>
 <p>之前的错误原因：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** Creates a new Output for writing to an OutputStream. A buffer size of 4096 is used. */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Output</span> <span class="params">(OutputStream outputStream)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>(<span class="number">4096</span>, <span class="number">4096</span>);</span><br><span class="line">		<span class="keyword">if</span> (outputStream == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"outputStream cannot be null."</span>);</span><br><span class="line">		<span class="keyword">this</span>.outputStream = outputStream;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Output</span> <span class="params">(<span class="keyword">int</span> bufferSize, <span class="keyword">int</span> maxBufferSize)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (bufferSize &gt; maxBufferSize &amp;&amp; maxBufferSize != -<span class="number">1</span>)</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"bufferSize: "</span> + bufferSize + <span class="string">" cannot be greater than maxBufferSize: "</span> + maxBufferSize);</span><br><span class="line">		<span class="keyword">if</span> (maxBufferSize &lt; -<span class="number">1</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"maxBufferSize cannot be &lt; -1: "</span> + maxBufferSize);</span><br><span class="line">		<span class="keyword">this</span>.capacity = bufferSize;</span><br><span class="line">		<span class="keyword">this</span>.maxCapacity = maxBufferSize == -<span class="number">1</span> ? Integer.MAX_VALUE : maxBufferSize;</span><br><span class="line">		buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[bufferSize];</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** Creates a new Output for writing to an OutputStream. A buffer size of 4096 is used. */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Output</span> <span class="params">(OutputStream outputStream)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>(<span class="number">4096</span>, <span class="number">4096</span>);</span><br><span class="line">		<span class="keyword">if</span> (outputStream == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"outputStream cannot be null."</span>);</span><br><span class="line">		<span class="keyword">this</span>.outputStream = outputStream;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Output</span> <span class="params">(<span class="keyword">int</span> bufferSize, <span class="keyword">int</span> maxBufferSize)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (bufferSize &gt; maxBufferSize &amp;&amp; maxBufferSize != -<span class="number">1</span>)</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"bufferSize: "</span> + bufferSize + <span class="string">" cannot be greater than maxBufferSize: "</span> + maxBufferSize);</span><br><span class="line">		<span class="keyword">if</span> (maxBufferSize &lt; -<span class="number">1</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"maxBufferSize cannot be &lt; -1: "</span> + maxBufferSize);</span><br><span class="line">		<span class="keyword">this</span>.capacity = bufferSize;</span><br><span class="line">		<span class="keyword">this</span>.maxCapacity = maxBufferSize == -<span class="number">1</span> ? Integer.MAX_VALUE : maxBufferSize;</span><br><span class="line">		buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[bufferSize];</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></div></figure>
 
 <p>看源码以为是最大maxBuffer都是4KB导致的；其实不是，kryo支持自动扩容：</p>
 <p>上面这个构造函数，如果指定了外部的一个OutputStream的话，他会每次达到Output的buffer的4096字节后，执行一次刷新操作，把这4096字节刷新到指定的那个输出流，然后清空buffer，继续执行序列化</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">writeVarInt</span> <span class="params">(<span class="keyword">int</span> value, <span class="keyword">boolean</span> optimizePositive)</span> <span class="keyword">throws</span> KryoException </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (!optimizePositive) value = (value &lt;&lt; <span class="number">1</span>) ^ (value &gt;&gt; <span class="number">31</span>);</span><br><span class="line">		<span class="keyword">if</span> (value &gt;&gt;&gt; <span class="number">7</span> == <span class="number">0</span>) &#123;</span><br><span class="line">			require(<span class="number">1</span>);</span><br><span class="line">			buffer[position++] = (<span class="keyword">byte</span>)value;</span><br><span class="line">			<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** <span class="doctag">@return</span> true if the buffer has been resized. */</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">require</span> <span class="params">(<span class="keyword">int</span> required)</span> <span class="keyword">throws</span> KryoException </span>&#123;</span><br><span class="line">        <span class="comment">//初始容量够用</span></span><br><span class="line">		<span class="keyword">if</span> (capacity - position &gt;= required) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		<span class="comment">// 申请空间大于最大容量值</span></span><br><span class="line">        <span class="keyword">if</span> (required &gt; maxCapacity)</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> KryoException(<span class="string">"Buffer overflow. Max capacity: "</span> + maxCapacity + <span class="string">", required: "</span> + required);</span><br><span class="line">        <span class="comment">//刷新缓存</span></span><br><span class="line">		flush();</span><br><span class="line">        <span class="comment">//如果没有使用 outputStream，则需要设置最大容量，未超过最大容量则自动扩容</span></span><br><span class="line">		<span class="keyword">while</span> (capacity - position &lt; required) &#123;</span><br><span class="line">			<span class="keyword">if</span> (capacity == maxCapacity)</span><br><span class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> KryoException(<span class="string">"Buffer overflow. Available: "</span> + (capacity - position) + <span class="string">", required: "</span> + required);</span><br><span class="line">			<span class="comment">// Grow buffer.</span></span><br><span class="line">            <span class="comment">//自动扩容</span></span><br><span class="line">			<span class="keyword">if</span> (capacity == <span class="number">0</span>) capacity = <span class="number">1</span>;</span><br><span class="line">			capacity = Math.min(capacity * <span class="number">2</span>, maxCapacity);</span><br><span class="line">			<span class="keyword">if</span> (capacity &lt; <span class="number">0</span>) capacity = maxCapacity;</span><br><span class="line">			<span class="keyword">byte</span>[] newBuffer = <span class="keyword">new</span> <span class="keyword">byte</span>[capacity];</span><br><span class="line">			System.arraycopy(buffer, <span class="number">0</span>, newBuffer, <span class="number">0</span>, position);</span><br><span class="line">			buffer = newBuffer;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Writes the buffered bytes to the underlying OutputStream, if any. */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flush</span> <span class="params">()</span> <span class="keyword">throws</span> KryoException </span>&#123;</span><br><span class="line">        <span class="comment">//如果没有设置outputStream 则直接返回</span></span><br><span class="line">		<span class="keyword">if</span> (outputStream == <span class="keyword">null</span>) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">//刷缓存到outputStream</span></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			outputStream.write(buffer, <span class="number">0</span>, position);</span><br><span class="line">			outputStream.flush();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> KryoException(ex);</span><br><span class="line">		&#125;</span><br><span class="line">        <span class="comment">//重置当前写入位置</span></span><br><span class="line">		total += position;</span><br><span class="line">		position = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">writeVarInt</span> <span class="params">(<span class="keyword">int</span> value, <span class="keyword">boolean</span> optimizePositive)</span> <span class="keyword">throws</span> KryoException </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (!optimizePositive) value = (value &lt;&lt; <span class="number">1</span>) ^ (value &gt;&gt; <span class="number">31</span>);</span><br><span class="line">		<span class="keyword">if</span> (value &gt;&gt;&gt; <span class="number">7</span> == <span class="number">0</span>) &#123;</span><br><span class="line">			require(<span class="number">1</span>);</span><br><span class="line">			buffer[position++] = (<span class="keyword">byte</span>)value;</span><br><span class="line">			<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** <span class="doctag">@return</span> true if the buffer has been resized. */</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">require</span> <span class="params">(<span class="keyword">int</span> required)</span> <span class="keyword">throws</span> KryoException </span>&#123;</span><br><span class="line">        <span class="comment">//初始容量够用</span></span><br><span class="line">		<span class="keyword">if</span> (capacity - position &gt;= required) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		<span class="comment">// 申请空间大于最大容量值</span></span><br><span class="line">        <span class="keyword">if</span> (required &gt; maxCapacity)</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> KryoException(<span class="string">"Buffer overflow. Max capacity: "</span> + maxCapacity + <span class="string">", required: "</span> + required);</span><br><span class="line">        <span class="comment">//刷新缓存</span></span><br><span class="line">		flush();</span><br><span class="line">        <span class="comment">//如果没有使用 outputStream，则需要设置最大容量，未超过最大容量则自动扩容</span></span><br><span class="line">		<span class="keyword">while</span> (capacity - position &lt; required) &#123;</span><br><span class="line">			<span class="keyword">if</span> (capacity == maxCapacity)</span><br><span class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> KryoException(<span class="string">"Buffer overflow. Available: "</span> + (capacity - position) + <span class="string">", required: "</span> + required);</span><br><span class="line">			<span class="comment">// Grow buffer.</span></span><br><span class="line">            <span class="comment">//自动扩容</span></span><br><span class="line">			<span class="keyword">if</span> (capacity == <span class="number">0</span>) capacity = <span class="number">1</span>;</span><br><span class="line">			capacity = Math.min(capacity * <span class="number">2</span>, maxCapacity);</span><br><span class="line">			<span class="keyword">if</span> (capacity &lt; <span class="number">0</span>) capacity = maxCapacity;</span><br><span class="line">			<span class="keyword">byte</span>[] newBuffer = <span class="keyword">new</span> <span class="keyword">byte</span>[capacity];</span><br><span class="line">			System.arraycopy(buffer, <span class="number">0</span>, newBuffer, <span class="number">0</span>, position);</span><br><span class="line">			buffer = newBuffer;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** Writes the buffered bytes to the underlying OutputStream, if any. */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flush</span> <span class="params">()</span> <span class="keyword">throws</span> KryoException </span>&#123;</span><br><span class="line">        <span class="comment">//如果没有设置outputStream 则直接返回</span></span><br><span class="line">		<span class="keyword">if</span> (outputStream == <span class="keyword">null</span>) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">//刷缓存到outputStream</span></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			outputStream.write(buffer, <span class="number">0</span>, position);</span><br><span class="line">			outputStream.flush();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> KryoException(ex);</span><br><span class="line">		&#125;</span><br><span class="line">        <span class="comment">//重置当前写入位置</span></span><br><span class="line">		total += position;</span><br><span class="line">		position = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></div></figure>
 
 <p>其实，正确使用kryo的用法有两种：</p>
 <ul>
@@ -115,193 +74,290 @@
 <li>使用outputStream来获取真实的对象字节流，这个kryo会自动刷缓存到outputStream中。无需设置maxCapacity</li>
 </ul>
 <p>使用代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不使用outputStream，需要使用size控制</span></span><br><span class="line">Output output = <span class="keyword">new</span> Output(<span class="number">4096</span>,<span class="number">4096</span>*<span class="number">4</span>);</span><br><span class="line">kryo = kryoPool.borrow();</span><br><span class="line">kryo.writeObject(output, obj);</span><br><span class="line">output.close();</span><br><span class="line">bytes[] bytes = output.toBytes();</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不使用outputStream，需要使用size控制</span></span><br><span class="line">Output output = <span class="keyword">new</span> Output(<span class="number">4096</span>,<span class="number">4096</span>*<span class="number">4</span>);</span><br><span class="line">kryo = kryoPool.borrow();</span><br><span class="line">kryo.writeObject(output, obj);</span><br><span class="line">output.close();</span><br><span class="line">bytes[] bytes = output.toBytes();</span><br></pre></td></tr></table></div></figure>
 
 
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">         <span class="comment">// 使用outputStream</span></span><br><span class="line">         ByteArrayOutputStream outputStream = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">         Output output = <span class="keyword">new</span> Output(outputStream);</span><br><span class="line">         kryo = kryoPool.borrow();</span><br><span class="line">         kryo.writeObject(output, obj);</span><br><span class="line">         output.close();</span><br><span class="line"><span class="comment">//此处需要注意，outputStream的结果输出</span></span><br><span class="line">         bytes = outputStream.toByteArray();</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">         <span class="comment">// 使用outputStream</span></span><br><span class="line">         ByteArrayOutputStream outputStream = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">         Output output = <span class="keyword">new</span> Output(outputStream);</span><br><span class="line">         kryo = kryoPool.borrow();</span><br><span class="line">         kryo.writeObject(output, obj);</span><br><span class="line">         output.close();</span><br><span class="line"><span class="comment">//此处需要注意，outputStream的结果输出</span></span><br><span class="line">         bytes = outputStream.toByteArray();</span><br></pre></td></tr></table></div></figure>
 
 <p>之前的代码把这两种方式进行混用了。</p>
 <p>测试代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestSerialize</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        TestSerialize t = <span class="keyword">new</span> TestSerialize();</span><br><span class="line">        <span class="comment">//t.testKryo();</span></span><br><span class="line">        t.testKryoD();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testKryo</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        User u = <span class="keyword">new</span> User();</span><br><span class="line">        u.setName(<span class="string">"sdfsdf"</span>);</span><br><span class="line">        u.setUserId(<span class="number">11</span>);</span><br><span class="line">        <span class="keyword">byte</span>[] serialize = KryoSerializer.serialize(u);</span><br><span class="line">        FileOutputStream fileWriter = <span class="keyword">new</span> FileOutputStream(<span class="keyword">new</span> File(<span class="string">"d:/k.bin"</span>));</span><br><span class="line">        fileWriter.write(serialize);</span><br><span class="line">        fileWriter.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testKryoD</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        FileInputStream in =<span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"d:/k.bin"</span>));</span><br><span class="line">        <span class="comment">//当文件没有结束时，每次读取一个字节显示</span></span><br><span class="line">        <span class="keyword">byte</span>[] data=<span class="keyword">new</span> <span class="keyword">byte</span>[in.available()];</span><br><span class="line">        in.read(data);</span><br><span class="line">        in.close();</span><br><span class="line">        User user = KryoSerializer.deSerialize(data, User<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(user.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testJava</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        User u = <span class="keyword">new</span> User();</span><br><span class="line"><span class="comment">//        u.setUserId(1);</span></span><br><span class="line">        u.setName(<span class="string">"2323"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] serialize = JavaSerializer.serialize(u);</span><br><span class="line"></span><br><span class="line">        FileOutputStream fileWriter = <span class="keyword">new</span> FileOutputStream(<span class="keyword">new</span> File(<span class="string">"d:/u.bin"</span>));</span><br><span class="line">        fileWriter.write(serialize);</span><br><span class="line">        fileWriter.close();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testJavaD</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        FileInputStream in =<span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"d:/u.bin"</span>));</span><br><span class="line">        <span class="comment">//当文件没有结束时，每次读取一个字节显示</span></span><br><span class="line">        <span class="keyword">byte</span>[] data=<span class="keyword">new</span> <span class="keyword">byte</span>[in.available()];</span><br><span class="line">        in.read(data);</span><br><span class="line">        in.close();</span><br><span class="line">        User user = JavaSerializer.deSerialize(data, User<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(user.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">229880032075948565L</span>;</span><br><span class="line">        <span class="keyword">private</span> Integer userId;</span><br><span class="line">        <span class="keyword">private</span> String name;</span><br><span class="line">        <span class="keyword">private</span> String sex;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestSerialize</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        TestSerialize t = <span class="keyword">new</span> TestSerialize();</span><br><span class="line">        <span class="comment">//t.testKryo();</span></span><br><span class="line">        t.testKryoD();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testKryo</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        User u = <span class="keyword">new</span> User();</span><br><span class="line">        u.setName(<span class="string">"sdfsdf"</span>);</span><br><span class="line">        u.setUserId(<span class="number">11</span>);</span><br><span class="line">        <span class="keyword">byte</span>[] serialize = KryoSerializer.serialize(u);</span><br><span class="line">        FileOutputStream fileWriter = <span class="keyword">new</span> FileOutputStream(<span class="keyword">new</span> File(<span class="string">"d:/k.bin"</span>));</span><br><span class="line">        fileWriter.write(serialize);</span><br><span class="line">        fileWriter.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testKryoD</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        FileInputStream in =<span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"d:/k.bin"</span>));</span><br><span class="line">        <span class="comment">//当文件没有结束时，每次读取一个字节显示</span></span><br><span class="line">        <span class="keyword">byte</span>[] data=<span class="keyword">new</span> <span class="keyword">byte</span>[in.available()];</span><br><span class="line">        in.read(data);</span><br><span class="line">        in.close();</span><br><span class="line">        User user = KryoSerializer.deSerialize(data, User<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(user.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testJava</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        User u = <span class="keyword">new</span> User();</span><br><span class="line"><span class="comment">//        u.setUserId(1);</span></span><br><span class="line">        u.setName(<span class="string">"2323"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] serialize = JavaSerializer.serialize(u);</span><br><span class="line"></span><br><span class="line">        FileOutputStream fileWriter = <span class="keyword">new</span> FileOutputStream(<span class="keyword">new</span> File(<span class="string">"d:/u.bin"</span>));</span><br><span class="line">        fileWriter.write(serialize);</span><br><span class="line">        fileWriter.close();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testJavaD</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        FileInputStream in =<span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(<span class="string">"d:/u.bin"</span>));</span><br><span class="line">        <span class="comment">//当文件没有结束时，每次读取一个字节显示</span></span><br><span class="line">        <span class="keyword">byte</span>[] data=<span class="keyword">new</span> <span class="keyword">byte</span>[in.available()];</span><br><span class="line">        in.read(data);</span><br><span class="line">        in.close();</span><br><span class="line">        User user = JavaSerializer.deSerialize(data, User<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(user.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">229880032075948565L</span>;</span><br><span class="line">        <span class="keyword">private</span> Integer userId;</span><br><span class="line">        <span class="keyword">private</span> String name;</span><br><span class="line">        <span class="keyword">private</span> String sex;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></div></figure>
 
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://frank0.top">frank0</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://frank0.top/2019/11/21/kyro-error/">https://frank0.top/2019/11/21/kyro-error/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2020/04/22/Thymeleaf-Layout-GC-Error/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Thymeleaf-Layout引起的内存泄露</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2019/04/16/JDK8-dynamic-proxy/"><span class="paginator-prev__text">JDK8-dynamic-proxy</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div><div class="comments" id="comments"><div id="disqus_thread"></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/1ljgafydk5a570.jpg" alt="avatar"></div><p class="sidebar-ov-author__text">人生不是拥有多少，而是经历多少</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/frankan0" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="https://twitter.com/frank0099855112" target="_blank" rel="noopener" data-popover="Twitter" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-twitter"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">10</div><div class="sidebar-ov-state-item__name">归档</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2019~2020</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>frank0</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v4.2.0</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.1.1</span></div><div class="busuanzi"><span class="busuanzi-siteuv"><span class="busuanzi-siteuv__icon"><i class="fas fa-user"></i></span><span class="busuanzi-siteuv__info">访问人数</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_uv"></span></span><span class="busuanzi-sitepv"><span class="busuanzi-siteuv__icon"><i class="fas fa-eye"></i></span><span class="busuanzi-siteuv__info">浏览总量</span><span class="busuanzi-siteuv__value" id="busuanzi_value_site_pv"></span></span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><div class="search-mask"></div><div class="search-popup"><span class="search-close"></span><div class="search-input"><input placeholder="搜索文章（支持多关键词，请用空格分隔）"></div><div class="search-results"></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/ribbon.js@latest/dist/ribbon.min.js" size="120" alpha="0.6" zIndex="-1"></script><script>function initSearch() {
+  var isXML = true;
+  var search_path = 'search.json';
 
-                                                                        
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://frank0.top/2019/11/21/kyro-error/" data-id="ckdya1zdd000517s6fhrzgksu" class="article-share-link">
-                                            分享
-                                        </a>
-                                        
-                                    </footer>
+  if (!search_path) {
+    search_path = 'search.xml';
+  } else if (/json$/i.test(search_path)) {
+    isXML = false;
+  }
 
-    </div>
+  var path = '/' + search_path;
+  $.ajax({
+    url: path,
+    dataType: isXML ? 'xml' : 'json',
+    async: true,
+    success: function (res) {
+      var datas = isXML ? $('entry', res).map(function () {
+        // 将 XML 转为 JSON
+        return {
+          title: $('title', this).text(),
+          content: $('content', this).text(),
+          url: $('url', this).text()
+        };
+      }).get() : res;
+      var $input = $('.search-input input');
+      var $result = $('.search-results');
+      // 搜索对象（标题、内容）的权重，影响显示顺序
+      var WEIGHT = { title: 100, content: 1 };
+      var searchPost = function () {
+        var searchText = $input.val().toLowerCase().trim();
+        // 根据空白字符分隔关键字
+        var keywords = searchText.split(/[\s]+/);
+        // 搜索结果
+        var matchPosts = [];
 
-    
-        
-  <nav class="article-nav">
-    
-      <a href="/2020/04/22/Thymeleaf-Layout-GC-Error/" class="article-nav-link">
-        <strong class="article-nav-caption">前一篇</strong>
-        <div class="article-nav-title">
-          
-            Thymeleaf-Layout引起的内存泄露
-          
-        </div>
-      </a>
-    
-    
-      <a href="/2019/04/16/JDK8-dynamic-proxy/" class="article-nav-link">
-        <strong class="article-nav-caption">后一篇</strong>
-        <div class="article-nav-title">JDK8-dynamic-proxy</div>
-      </a>
-    
-  </nav>
+        // 有多个关键字时，将原文字整个保存下来
+        if (keywords.length > 1) {
+          keywords.push(searchText);
+        }
+        // 防止未输入字符时搜索
+        if (searchText.length > 0) {
+          datas.forEach(function (data) {
+            var isMatch  = false;
+            // 没有标题的文章使用预设的 i18n 变量代替
+            var title = (data.title && data.title.trim()) || '[ 文章无标题 ]';
+            var titleLower = title && title.toLowerCase();
+            // 删除 HTML 标签 和 所有空白字符
+            var content = data.content && data.content.replace(/<[^>]+>/g, '');
+            var contentLower = content && content.toLowerCase();
+            // 删除重复的 /
+            var postURL = data.url && decodeURI(data.url).replace(/\/{2,}/g, '/');
+            // 标题中匹配到的关键词
+            var titleHitSlice = [];
+            // 内容中匹配到的关键词
+            var contentHitSlice = [];
 
+            keywords.forEach(function (keyword) {
+              /**
+              * 获取匹配的关键词的索引
+              * @param {String} keyword 要匹配的关键字
+              * @param {String} text 原文字
+              * @param {Boolean} caseSensitive 是否区分大小写
+              * @param {Number} weight 匹配对象的权重。权重大的优先显示
+              * @return {Array}
+              */
+              function getIndexByword (word, text, caseSensitive, weight) {
+                if (!word || !text) {
+                  return [];
+                };
 
-            
+                var startIndex = 0; // 每次匹配的开始索引
+                var index = -1;     // 匹配到的索引值
+                var result = [];    // 匹配结果
 
-                
-                    
-    <div class="vcomments" id="vcomments"></div>
-    
-<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+                if (!caseSensitive) {
+                  word = word.toLowerCase();
+                  text = text.toLowerCase();
+                }
 
-        <script>
-            new Valine({
-                el: '#vcomments',
-                appId: 'Gh2oOlBjwQgEJQvtveG690Ko-gzGzoHsz',
-                appKey: 'oX17NmUs7sFsGaG1Tgb7Nc9g',
-                notify: 'false',
-                verify: 'true',
-                avatar: 'mp',
-                pageSize: '10',
-                placeholder: '请输入...'
-            })
-        </script>
-        
-                        
-                            
+                while((index = text.indexOf(word, startIndex)) !== -1) {
+                  var hasMatch = false;
+                  // 索引位置相同的关键词，保留长度较长的
+                  titleHitSlice.forEach(function (hit) {
+                    if (hit.index === index && hit.word.length < word.length) {
+                      hit.word = word;
+                      hasMatch = true;
+                    }
+                  });
+                  startIndex = index + word.length;
+                  !hasMatch && result.push({ index: index, word: word, weight: weight });
+                }
+                return result;
+              }
+              titleHitSlice = titleHitSlice.concat(getIndexByword(keyword, titleLower, false, WEIGHT.title));
+              contentHitSlice = contentHitSlice.concat(getIndexByword(keyword, contentLower, false, WEIGHT.content));
+            });
 
-</article>
-</section>
-  <footer class="footer">
-  <div class="outer">
-    <div class="float-right">
-      <ul class="list-inline">
-  
-    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
-  
-    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
-  
-</ul>
-    </div>
-    <ul class="list-inline">
-      <li>&copy; 2020 frank0&#39;s Blog</li>
-      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
-      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean" target="_blank" rel="noopener">Ocean</a></li>
-    </ul>
-  </div>
-</footer>
+            var hitTitle = titleHitSlice.length;
+            var hitContent = contentHitSlice.length;
 
-</main>
-<aside class="sidebar">
-  <button class="navbar-toggle"></button>
-<nav class="navbar">
-  
-    <div class="logo">
-      <a href="/"><img src="/images/hexo.svg" alt="frank0&#39;s Blog"></a>
-    </div>
-  
-  <ul class="nav nav-main">
-    
-      <li class="nav-item">
-        <a class="nav-item-link" href="/">Home</a>
-      </li>
-    
-      <li class="nav-item">
-        <a class="nav-item-link" href="/archives">Archives</a>
-      </li>
-    
-      <li class="nav-item">
-        <a class="nav-item-link" href="/gallery">Gallery</a>
-      </li>
-    
-      <li class="nav-item">
-        <a class="nav-item-link" href="/about">About</a>
-      </li>
-    
-    <li class="nav-item">
-      <a class="nav-item-link nav-item-search" title="搜索">
-        <i class="fe fe-search"></i>
-        搜索
-      </a>
-    </li>
-  </ul>
-</nav>
-<nav class="navbar navbar-bottom">
-  <ul class="nav">
-    <li class="nav-item">
-      <div class="totop" id="totop">
-  <i class="fe fe-rocket"></i>
-</div>
-    </li>
-    <li class="nav-item">
-      
-        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
-          <i class="fe fe-feed"></i>
-        </a>
-      
-    </li>
-  </ul>
-</nav>
-<div class="search-form-wrap">
-  <div class="local-search local-search-plugin">
-  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
-  <div id="local-search-result" class="local-search-result"></div>
-</div>
-</div>
-</aside>
+            if (hitTitle > 0 || hitContent > 0) {
+              isMatch = true;
+            }
+            if (isMatch) {
+              ;[titleHitSlice, contentHitSlice].forEach(function (hit) {
+                // 按照匹配文字的索引的递增顺序排序
+                hit.sort(function (left, right) {
+                  return left.index - right.index;
+                });
+              });
+              /**
+              * 给文本中匹配到的关键词添加标记，从而进行高亮显示
+              * @param {String} text 原文本
+              * @param {Array} hitSlice 匹配项的索引信息
+              * @param {Number} start 开始索引
+              * @param {Number} end 结束索引
+              * @return {String}
+              */
+              function highlightKeyword (text, hitSlice, start, end) {
+                if (!text || !hitSlice || !hitSlice.length) {
+                  return;
+                }
 
-<script src="/js/jquery-2.0.3.min.js"></script>
+                var result = '';
+                var startIndex = start;
+                var endIndex = end;
+                hitSlice.forEach(function (hit) {
+                  if (hit.index < startIndex) {
+                    return;
+                  }
 
+                  var hitWordEnd = hit.index + hit.word.length;
+                  result += text.slice(startIndex, hit.index);
+                  result += '<b>' + text.slice(hit.index, hitWordEnd) + '</b>';
+                  startIndex = hitWordEnd;
+                });
+                result += text.slice(startIndex, endIndex);
+                return result;
+              }
 
-<script src="/js/jquery.justifiedGallery.min.js"></script>
+              var postData = {};
+              // 文章总的搜索权重
+              var postWeight = titleHitSlice.length * WEIGHT.title + contentHitSlice.length * WEIGHT.content;
+              // 标记匹配关键词后的标题
+              var postTitle = highlightKeyword(title, titleHitSlice, 0, title.length) || title;
+              // 标记匹配关键词后的内容
+              var postContent;
+              // 显示内容的长度
+              var SHOW_WORD_LENGTH = 200;
+              // 命中关键词前的字符显示长度
+              var SHOW_WORD_FRONT_LENGTH = 20;
+              var SHOW_WORD_END_LENGTH = SHOW_WORD_LENGTH - SHOW_WORD_FRONT_LENGTH;
 
+              // 截取匹配的第一个字符，前后共 200 个字符来显示
+              if (contentHitSlice.length > 0) {
+                var firstIndex = contentHitSlice[0].index;
+                var start = firstIndex > SHOW_WORD_FRONT_LENGTH ? firstIndex - SHOW_WORD_FRONT_LENGTH : 0;
+                var end = firstIndex + SHOW_WORD_END_LENGTH;
+                postContent = highlightKeyword(content, contentHitSlice, start, end);
+              } else { // 未匹配到内容，直接截取前 200 个字符来显示
+                postContent = content.slice(0, SHOW_WORD_LENGTH);
+              }
+              postData.title = postTitle;
+              postData.content = postContent;
+              postData.url = postURL;
+              postData.weight = postWeight;
+              matchPosts.push(postData);
+            }
+          });
+        }
 
-<script src="/js/lazyload.min.js"></script>
+        var resultInnerHtml = '';
+        if (matchPosts.length) {
+          // 按权重递增的顺序排序，使权重大的优先显示
+          matchPosts.sort(function (left, right) {
+            return right.weight - left.weight;
+          });
+          resultInnerHtml += '<ul>';
+          matchPosts.forEach(function (post) {
+            resultInnerHtml += '<li><a class="search-results-title" href="' + post.url + '">';
+            resultInnerHtml += post.title;
+            resultInnerHtml += '</a><div class="search-results-content">';
+            resultInnerHtml += post.content;
+            resultInnerHtml += '</div></li>';
+          });
+          resultInnerHtml += '</ul>';
+        } else {
+          resultInnerHtml += '<div class="search-results-none"><i class="far fa-meh"></i></div>';
+        }
+        $result.html(resultInnerHtml);
+      };
+      $input.on('input', searchPost);
+      $input.on('keyup', function (e) {
+        if (e.keyCode === Stun.utils.codeToKeyCode('Enter')) {
+          searchPost();
+        }
+      });
+    }
+  });
+}
 
+function closeSearch () {
+  $('body').css({ overflow: 'auto' });
+  $('.search-popup').css({ display: 'none' });
+  $('.search-mask').css({ display: 'none' });
+}
 
-<script src="/js/busuanzi-2.3.pure.min.js"></script>
+window.addEventListener('DOMContentLoaded', function () {
+  Stun.utils.pjaxReloadLocalSearch = function () {
+    $('.header-nav-search').on('click', function (e) {
+      e.stopPropagation();
+      $('body').css('overflow', 'hidden');
+      $('.search-popup')
+        .velocity('stop')
+        .velocity('transition.expandIn', {
+          duration: 300,
+          complete: function () {
+            $('.search-popup input').focus();
+          }
+        });
+      $('.search-mask')
+        .velocity('stop')
+        .velocity('transition.fadeIn', {
+          duration: 300
+        });
 
-
-  
-<script src="/fancybox/jquery.fancybox.min.js"></script>
-
-
-
-
-  
-<script src="/js/tocbot.min.js"></script>
-
-  <script>
-    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
-    tocbot.init({
-      tocSelector: '.tocbot',
-      contentSelector: '.article-entry',
-      headingSelector: 'h1, h2, h3, h4, h5, h6',
-      hasInnerContainers: true,
-      scrollSmooth: true,
-      positionFixedSelector: '.tocbot',
-      positionFixedClass: 'is-position-fixed',
-      fixedSidebarOffset: 'auto',
+      initSearch();
     });
-  </script>
+    $('.search-mask, .search-close').on('click', function () {
+      closeSearch();
+    });
+    $(document).on('keydown', function (e) {
+      // Escape <=> 27
+      if (e.keyCode === Stun.utils.codeToKeyCode('Escape')) {
+        closeSearch();
+      }
+    });
+  };
 
+  Stun.utils.pjaxReloadLocalSearch();
+}, false);</script><script src="https://cdn.jsdelivr.net/gh/sukkaw/busuanzi@latest/bsz.pure.mini.js" async></script><script>function loadDisqus () {
+  if (!document.getElementById('disqus_thread')) {
+    return;
+  }
+  if (window.DISQUS) {
+    DISQUS.reset({
+      reload: true,
+      config: function () {
+        this.page.url = 'https://frank0.top/2019/11/21/kyro-error/';
+        this.page.identifier = '2019/11/21/kyro-error/';
+        this.page.title = 'kyro序列化错误';
+      }
+    });
+  } else {
+    var d = document;
+    var sc = d.createElement('script');
+    var se = d.createElement('script');
 
+    if (true) {
+      sc.src = 'https://frank0.disqus.com/count.js';
+      sc.id = 'dsq-count-scr';
+      sc.async = true;
+      if (false) {
+        sc.setAttribute('data-pjax', '');
+      }
+      (d.head || d.body).appendChild(sc);
+    }
+    se.src = 'https://frank0.disqus.com/embed.js';
+    (d.head || d.body).appendChild(se);
+  }
+}
 
-<script src="/js/ocean.js"></script>
-
-
-</body>
-</html>
+if (false) {
+  loadDisqus();
+} else {
+  window.addEventListener('DOMContentLoaded', loadDisqus, false);
+}</script><script src="/js/utils.js?v=2.1.1"></script><script src="/js/stun-boot.js?v=2.1.1"></script><script src="/js/scroll.js?v=2.1.1"></script><script src="/js/header.js?v=2.1.1"></script><script src="/js/sidebar.js?v=2.1.1"></script><script type="application/json" src="/search.json"></script></body></html>
