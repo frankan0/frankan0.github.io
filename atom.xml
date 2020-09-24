@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://frank0.top/"/>
-  <updated>2020-09-11T09:08:02.754Z</updated>
+  <updated>2020-09-24T08:25:50.584Z</updated>
   <id>https://frank0.top/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis基础4_数据持久化之RDB</title>
+    <link href="https://frank0.top/2020/09/24/Redis%E5%9F%BA%E7%A1%80-%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E4%B9%8BRDB/"/>
+    <id>https://frank0.top/2020/09/24/Redis%E5%9F%BA%E7%A1%80-%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96%E4%B9%8BRDB/</id>
+    <published>2020-09-24T08:24:18.000Z</published>
+    <updated>2020-09-24T08:25:50.584Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>上篇说了Redis持久化之AOF，他有利也有弊，利是每次执行时追加的AOF数据不多，只要不配置成Always效率影响不会很大，弊是当我们需要恢复数据时，因为是每个命令都写入了AOP所以恢复时间比较长，所以出现了另外一种持久化方法 RDB：把Redis的数据快照 保存下来，因为保存的全是数据，所以恢复时直接写入内存即可，恢复速度比较快。</p></blockquote><a id="more"></a><p>使用RDB持久化，需要搞清楚两个问题：</p><ol><li>是否阻塞线程？服务器是否能够继续处理请求？</li><li>每次持久化是全量数据吗？</li></ol><h4 id="是否阻塞线程？服务器是否能够继续处理请求？？"><a href="#是否阻塞线程？服务器是否能够继续处理请求？？" class="headerlink" title="是否阻塞线程？服务器是否能够继续处理请求？？"></a>是否阻塞线程？服务器是否能够继续处理请求？？</h4><p>RDB持久化有两个命令： <code>save</code> 和 <code>bgsave</code> save是在主线程中执行，会阻塞线程；<code>bgsave</code>不会阻塞线程，由于是fork出子线程进行RDB持久化，那么服务器就可以继续处理请求，读请求还好说，不改变内存数据，那么写请求时，redis如何处理？而且redis使用RDB持久化，是持久化<code>全量快照数据</code>，当数据量很大时，效率必定不会很高。</p><p>但是，这时RedisServer 是可以处理写请求的，他是怎么处理的？</p><p>注意上面<code>bgsave</code>命令是fork出子线程，这时子线程是可以访问父进程的内存数据的，Redis就利用操作系统的<a href="https://www.cnblogs.com/biyeymyhjob/archive/2012/07/20/2601655.html" target="_blank" rel="noopener">写时复制</a>技术，把父进程修改的数据，复制一份给子进程，这样子进程还是保存的是最新的数据，父进行还是可以处理写请求。</p><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200924155944631.png" alt="image-20200924155944631" style="zoom:50%;" /><h4 id="每次持久化是全量数据吗？"><a href="#每次持久化是全量数据吗？" class="headerlink" title="每次持久化是全量数据吗？"></a>每次持久化是全量数据吗？</h4><p>如果内存数据很多很大，每次持久化全量数据势必会影响效率，所以Redis4.0以后有了“增量快照功能”，其实是全量快照+AOF日志结合起来使用，第一次全量快照后，每隔一段时间再次做全量快照；两次全量快照的时间间隔间，使用AOF日志记录变化的数据。</p><p>如图：</p><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20200924161409328.png" alt="image-20200924161409328" style="zoom:50%;" /><p>假如，在两次全量快照的时间之中，发生了宕机，可以使用RDB来快速恢复数据，同时利用AOF日志来做增量恢复。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;上篇说了Redis持久化之AOF，他有利也有弊，利是每次执行时追加的AOF数据不多，只要不配置成Always效率影响不会很大，弊是当我们需要恢复数据时，因为是每个命令都写入了AOP所以恢复时间比较长，所以出现了另外一种持久化方法 RDB：把Redis的数据快照 保存下来，因为保存的全是数据，所以恢复时直接写入内存即可，恢复速度比较快。&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+    
+      <category term="redis" scheme="https://frank0.top/tags/redis/"/>
+    
+  </entry>
   
   <entry>
     <title>Redis基础3_数据持久化之AOF</title>
