@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://frank0.top/"/>
-  <updated>2020-12-10T09:29:01.325Z</updated>
+  <updated>2021-03-04T07:21:41.808Z</updated>
   <id>https://frank0.top/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>redis的缓存一致性问题</title>
+    <link href="https://frank0.top/2021/01/04/redis%E7%9A%84%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98/"/>
+    <id>https://frank0.top/2021/01/04/redis%E7%9A%84%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E9%97%AE%E9%A2%98/</id>
+    <published>2021-01-04T07:16:09.000Z</published>
+    <updated>2021-03-04T07:21:41.808Z</updated>
+    
+    <content type="html"><![CDATA[<p>Redis多用来做缓存，缓存就是为了减少与数据库读数据的时间差异问题，用来加快访问。</p><p>用了缓存，我们就要面对缓存一致性问题；</p><p>由于操作数据库与操作redis不是原子操作，所以就有不一致的问题；</p><p>有两种处理方法：</p><p>1.<strong>如果缓存能够提前缓存</strong>，可以采用rocketmq的顺序消息来保证数据库与缓存的数据一致性</p><p>​    很多情况都是可以提前缓存数据的，比如说商城营销活动数据，抢购数据等</p><p>2.如果缓存不能够提前缓存，我们可以选择加锁来保证数据的一致性，但是这个代价有点大，如果用户看到的数据对业务影响不大，即使晚一点看到我们的数据更新也没问题，我们可以使用延迟消息来同步缓存</p><p>3.使用延迟消息来同步缓存</p><p>我们常规的查询操作：</p><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20210127183258573.png" alt="image-20210127183258573" style="zoom: 50%;" /><p>更新操作时：</p><p><img src="https://frankblogimgs.oss-cn-beijing.aliyuncs.com/image-20210127184035905.png" alt="image-20210127184035905"></p><p>第一次删除缓存，更新数据库后，第二次再次删除缓存，最后发送延迟消息，异步删除缓存。</p><p><strong>为什么会有两次删除操作？</strong></p><p>当第一次删除后，更新了数据库，但是另外一个线程进行了查询，所以这时候缓存已经被查询线程更新了，数据不一致。</p><p>第二次删除，发现缓存不存在，则从DB获取数据此时，数据是最新的。</p><p><strong>为什么会有异步删除？</strong></p><p>异步删除是为了保证最后一次删除操作最终成功。 </p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Redis多用来做缓存，缓存就是为了减少与数据库读数据的时间差异问题，用来加快访问。&lt;/p&gt;
+&lt;p&gt;用了缓存，我们就要面对缓存一致性问题；&lt;/p&gt;
+&lt;p&gt;由于操作数据库与操作redis不是原子操作，所以就有不一致的问题；&lt;/p&gt;
+&lt;p&gt;有两种处理方法：&lt;/p&gt;
+&lt;p&gt;1.&lt;
+      
+    
+    </summary>
+    
+    
+    
+      <category term="redis 缓存" scheme="https://frank0.top/tags/redis-%E7%BC%93%E5%AD%98/"/>
+    
+  </entry>
   
   <entry>
     <title>变量</title>
